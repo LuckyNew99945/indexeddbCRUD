@@ -37,6 +37,33 @@ btnCreate.onclick = (e) => {
 
 btnRead.onclick = table;
 
+btnUpdate.onclick = () => {
+  const id = parseInt(userId.value || 0);
+  if(id) {
+
+    db.products.update(id,{
+      name : proName.value,
+      seller : seller.value,
+      price: price.value
+    }).then(updated => {
+      let get = updated ? `Data Updated`: `Could not Update Data`;
+      console.log(get);
+    })
+
+  }
+
+
+}
+
+btnDelete.onclick = () => {
+  db.delete();
+  db = productDb('Productdb', {
+    products: `++id,name,seller,price`
+  });
+  db.open();
+  table();
+}
+
 
 function table() {
   const tbody = document.getElementById('tBody');
@@ -61,12 +88,16 @@ function table() {
 
         createEle('td',tr, td => {
           createEle('i', td, i => {
-            i.className += 'fas fa-edit btn-edit'
+            i.className += 'fas fa-edit btn-edit';
+            i.setAttribute('data-id', data.id);
+            i.onclick = editbtn;
           })
         })
         createEle('td',tr, td => {
           createEle('i', td, i => {
             i.className += 'fas fa-trash-alt btn-delete'
+            i.setAttribute('data-id', data.id);
+            i.onclick = deletebtn;
           })
         })
       }
@@ -76,5 +107,24 @@ function table() {
       )
     }
   })
+}
+
+function editbtn(e) {
+
+  let id = parseInt(e.target.dataset.id);
+
+  db.products.get(id, data => {
+   
+    userId.value = data.id || 0;
+    proName.value = data.name || '';
+    seller.value = data.seller || '';
+    price.value = data.price || '';
+  })
+}
+
+function deletebtn(e) {
+  let id = parseInt(e.target.dataset.id);
+  db.products.delete(id);
+  table();
 }
 

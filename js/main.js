@@ -18,6 +18,9 @@ const btnRead = document.getElementById('btnRead');
 const btnUpdate = document.getElementById('btnUpdate');
 const btnDelete = document.getElementById('btnDelete');
 
+//notfound
+const notfound = document.getElementById('notfound');
+
 //Event Listener
 
 btnCreate.onclick = (e) => {
@@ -33,6 +36,18 @@ btnCreate.onclick = (e) => {
   getData(db.products,(data) => {
     userId.value = data.id + 1 || 1;
   });
+
+  table();
+
+  let insertmsg = document.querySelector('.insertmsg');
+
+  console.log(insertmsg);
+
+  getMsg(flag, insertmsg);
+
+
+
+  
 }
 
 btnRead.onclick = table;
@@ -46,11 +61,21 @@ btnUpdate.onclick = () => {
       seller : seller.value,
       price: price.value
     }).then(updated => {
-      let get = updated ? `Data Updated`: `Could not Update Data`;
-      console.log(get);
+      // let get = updated ? `Data Updated`: `Could not Update Data`;
+      let get = updated ? true : false;
+
+      let updatemsg = document.querySelector('.updatemsg');
+
+      getMsg(get, updatemsg);
+
+      proName.value = '';
+      seller.value = '';
+      price.value = '';
     })
 
   }
+
+ 
 
 
 }
@@ -62,8 +87,26 @@ btnDelete.onclick = () => {
   });
   db.open();
   table();
+
+  textID(userId);
+
+  let deletemsg = document.querySelector('.deletemsg');
+
+  getMsg(true,deletemsg);
 }
 
+
+//window onload
+
+window.onload = () => {
+  textID(userId);
+}
+
+function textID(textboxid) {
+  getData(db.products, data => {
+    textboxid.value = data.id + 1 || 1 ;
+  })
+}
 
 function table() {
   const tbody = document.getElementById('tBody');
@@ -105,6 +148,8 @@ function table() {
       
       
       )
+    } else {
+      notfound.textContent = `No record found in Database`;
     }
   })
 }
@@ -126,5 +171,17 @@ function deletebtn(e) {
   let id = parseInt(e.target.dataset.id);
   db.products.delete(id);
   table();
+}
+
+function getMsg(flag,element) {
+  if(flag) {
+    element.classList.add('movedown');
+    
+    setTimeout(() => {
+      element.classList.forEach(classname => {
+        classname == 'movedown' ? undefined : element.classList.remove('movedown');
+      });
+    },4000)
+  }
 }
 
